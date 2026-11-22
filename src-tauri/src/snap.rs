@@ -1,6 +1,7 @@
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::Duration;
 use tauri::{Manager, PhysicalPosition, WebviewWindow};
+use tauri_plugin_window_state::{AppHandleExt, StateFlags};
 
 /// How close (logical px) to an edge the widget has to be dropped to snap.
 const THRESHOLD: f64 = 48.0;
@@ -82,11 +83,21 @@ pub fn on_moved(window: &WebviewWindow) {
     let window = window.clone();
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(SETTLE).await;
-        if window.state::<SnapState>().generation.load(Ordering::Relaxed) == generation {
+        if window.state::<SnapState>().generation.load(Ordering::Relaxed) != generation {
+            return;
+        }
+        // On the main thread: saving locks the plugin's cache and queries the window, and from
+        // a background thread that deadlocks with the plugin's own Moved handler.
+        let app = window.app_handle().clone();
+        let _ = app.run_on_main_thread(move || {
             if let Err(e) = snap_now(&window) {
                 eprintln!("snap: {e}");
             }
-        }
+            // The plugin only writes to disk on a clean exit, which a Windows shutdown skips.
+            if let Err(e) = window.app_handle().save_window_state(StateFlags::POSITION | StateFlags::SIZE) {
+                eprintln!("save window state: {e}");
+            }
+        });
     });
 }
 
