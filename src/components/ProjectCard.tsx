@@ -1,6 +1,6 @@
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { ciLabel, ciTone, timeAgo, vercelTone } from "../lib/status";
-import type { GithubStatus, LocalStatus, ProjectStatus, Source, VercelDeploy } from "../types";
+import { ciLabel, ciTone, deployLabel, deployTone, timeAgo } from "../lib/status";
+import type { GithubStatus, LocalStatus, ProjectStatus, Source } from "../types";
 import { Dot, ErrorText, Row } from "./Row";
 
 type Props = { project: ProjectStatus; now: number };
@@ -30,7 +30,6 @@ export function ProjectCard({ project, now }: Props) {
       </header>
       <LocalRow source={project.local} />
       <GithubRows source={project.github} now={now} />
-      <VercelRow source={project.vercel} now={now} />
     </section>
   );
 }
@@ -72,7 +71,7 @@ function GithubRows({ source, now }: { source: Source<GithubStatus>; now: number
       </Row>
     );
   }
-  const { lastCommit, ci, openPrs, prsUrl, url } = source.data;
+  const { lastCommit, ci, openPrs, prsUrl, url, deploy } = source.data;
   return (
     <>
       <Row label="commit" url={lastCommit?.url ?? url} aside={lastCommit && timeAgo(lastCommit.date, now)}>
@@ -97,32 +96,13 @@ function GithubRows({ source, now }: { source: Source<GithubStatus>; now: number
           {openPrs === 0 ? "inga öppna" : `${openPrs} öppen${openPrs > 1 ? "a" : ""}`}
         </span>
       </Row>
+      {deploy && (
+        <Row label="deploy" url={deploy.url} aside={timeAgo(deploy.updatedAt, now)}>
+          <Dot tone={deployTone(deploy.state)} />
+          <span>{deploy.provider}</span>
+          <span className="text-zinc-500">{deployLabel(deploy.state)}</span>
+        </Row>
+      )}
     </>
-  );
-}
-
-function VercelRow({ source, now }: { source: Source<VercelDeploy | null>; now: number }) {
-  if (source.state === "off") return null;
-  if (source.state === "error") {
-    return (
-      <Row label="vercel">
-        <ErrorText>{source.message}</ErrorText>
-      </Row>
-    );
-  }
-  const deploy = source.data;
-  if (!deploy) {
-    return (
-      <Row label="vercel">
-        <span className="text-zinc-500">inga deploys</span>
-      </Row>
-    );
-  }
-  return (
-    <Row label="vercel" url={deploy.inspectorUrl ?? deploy.url} aside={timeAgo(deploy.createdMs, now)}>
-      <Dot tone={vercelTone(deploy.state)} />
-      <span>{deploy.state.toLowerCase()}</span>
-      {deploy.commitMessage && <span className="truncate text-zinc-500">{deploy.commitMessage}</span>}
-    </Row>
   );
 }

@@ -10,8 +10,6 @@ pub struct Config {
     pub lock_position: bool,
     /// Optional. When empty, the token from the GitHub CLI (`gh auth token`) is used.
     pub github_token: Option<String>,
-    pub vercel_token: Option<String>,
-    pub vercel_team_id: Option<String>,
     pub digitalocean_token: Option<String>,
     pub projects: Vec<ProjectConfig>,
 }
@@ -23,8 +21,6 @@ pub struct ProjectConfig {
     /// "owner/repo" on GitHub.
     pub repo: Option<String>,
     pub local_path: Option<String>,
-    /// Vercel project name or id.
-    pub vercel_project: Option<String>,
     pub note: Option<String>,
 }
 
@@ -36,20 +32,16 @@ impl Default for Config {
             name: name.into(),
             repo: Some(repo.into()),
             local_path: local(dir),
-            vercel_project: None,
             note: None,
         };
 
-        let mut portfolio = project("Portfolio", "trixxyy-cloner/Portfolio", "portfolio");
-        portfolio.vercel_project = Some("portfolio".into());
+        let portfolio = project("Portfolio", "trixxyy-cloner/Portfolio", "portfolio");
 
         Self {
             refresh_seconds: 120,
             start_with_windows: true,
             lock_position: false,
             github_token: None,
-            vercel_token: None,
-            vercel_team_id: None,
             digitalocean_token: None,
             projects: vec![
                 project("Krogkollen", "trixxyy-cloner/krogkollen", "krogkollen"),

@@ -4,8 +4,8 @@ A small always-on-desktop widget for Windows that shows the status of my project
 
 - **Local git** – current branch, uncommitted files, commits ahead/behind
 - **GitHub** – latest commit, open pull requests, latest Actions run
-- **Vercel** – latest production deploy
-- **DigitalOcean** – every App Platform app and its deploy phase (each running app costs money)
+- **Deploy** – production deploy status that Vercel reports back to GitHub as a commit status (no Vercel token needed)
+- **DigitalOcean** – every App Platform app and its deploy phase (each running app costs money); hidden without a token
 
 Click a project name to open its repo, or any row to open that page. Refreshes every 2 minutes, or on demand. Lives in the system tray (left-click toggles the widget, right-click for refresh/config/quit) and starts with Windows.
 
@@ -23,15 +23,12 @@ On first start the app writes `%APPDATA%\dev-dashboard-widget\config.json`. Open
   "startWithWindows": true,
   "lockPosition": false,
   "githubToken": null,
-  "vercelToken": "…",
-  "vercelTeamId": null,
-  "digitaloceanToken": "…",
+  "digitaloceanToken": null,
   "projects": [
     {
       "name": "Portfolio",
       "repo": "owner/repo",
       "localPath": "C:/path/to/repo",
-      "vercelProject": "portfolio",
       "note": null
     }
   ]
@@ -39,7 +36,6 @@ On first start the app writes `%APPDATA%\dev-dashboard-widget\config.json`. Open
 ```
 
 - `githubToken` – optional; falls back to the GitHub CLI (`gh auth token`).
-- `vercelToken` – create at vercel.com → Account Settings → Tokens.
 - `digitaloceanToken` – create at cloud.digitalocean.com → API → Tokens (read scope is enough).
 - Any field left `null` simply hides that source.
 
