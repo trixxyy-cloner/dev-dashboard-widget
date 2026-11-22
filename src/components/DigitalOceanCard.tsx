@@ -2,9 +2,9 @@ import { doTone, timeAgo } from "../lib/status";
 import type { DoApp, Source } from "../types";
 import { Dot, ErrorText, Row } from "./Row";
 
-type Props = { source: Source<DoApp[]>; now: number; onOpenConfig: () => void };
+type Props = { source: Source<DoApp[]>; now: number };
 
-export function DigitalOceanCard({ source, now, onOpenConfig }: Props) {
+export function DigitalOceanCard({ source, now }: Props) {
   return (
     <section className="rounded-xl border border-white/5 bg-white/[0.03] p-2">
       <header className="flex items-center justify-between gap-2 px-2 pb-1">
@@ -16,15 +16,6 @@ export function DigitalOceanCard({ source, now, onOpenConfig }: Props) {
           </span>
         )}
       </header>
-      {source.state === "off" && (
-        <button
-          type="button"
-          onClick={onOpenConfig}
-          className="w-full cursor-pointer rounded-md px-2 py-1 text-left text-xs text-zinc-500 hover:bg-white/5"
-        >
-          Lägg till <span className="font-mono text-zinc-300">digitaloceanToken</span> i config →
-        </button>
-      )}
       {source.state === "error" && (
         <Row label="api">
           <ErrorText>{source.message}</ErrorText>

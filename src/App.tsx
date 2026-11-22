@@ -27,7 +27,8 @@ export default function App() {
           <p className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-300">{error}</p>
         )}
         {data?.projects.map((project) => <ProjectCard key={project.name} project={project} now={now} />)}
-        {data && <DigitalOceanCard source={data.digitalocean} now={now} onOpenConfig={openConfig} />}
+        {/* Hidden until a token is configured, so unused hosting doesn't clutter the widget. */}
+        {data && data.digitalocean.state !== "off" && <DigitalOceanCard source={data.digitalocean} now={now} />}
       </div>
     </main>
   );
