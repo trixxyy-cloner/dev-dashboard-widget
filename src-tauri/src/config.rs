@@ -42,8 +42,6 @@ impl Default for Config {
 
         let mut portfolio = project("Portfolio", "trixxyy-cloner/Portfolio", "portfolio");
         portfolio.vercel_project = Some("portfolio".into());
-        let mut innovia = project("Innovia Hub", "trixxyy-cloner/Skola_innovia_gruppProjekt", "Skola_innovia_gruppProjekt");
-        innovia.note = Some("Ta bort DO-appen efter betyget".into());
 
         Self {
             refresh_seconds: 120,
@@ -56,8 +54,7 @@ impl Default for Config {
             projects: vec![
                 project("Krogkollen", "trixxyy-cloner/krogkollen", "krogkollen"),
                 portfolio,
-                innovia,
-                project("Innovia IoT", "trixxyy-cloner/Innovia-IoT", "innovia-iot"),
+                project("Dev Dashboard", "trixxyy-cloner/dev-dashboard-widget", "dev-dashboard-widget"),
             ],
         }
     }
