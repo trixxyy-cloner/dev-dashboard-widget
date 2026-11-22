@@ -21,20 +21,20 @@ export type CiRun = {
   url: string;
 };
 
+export type Deploy = {
+  provider: string;
+  state: string;
+  url: string | null;
+  updatedAt: string;
+};
+
 export type GithubStatus = {
   url: string;
   lastCommit: Commit | null;
   openPrs: number;
   prsUrl: string;
   ci: CiRun | null;
-};
-
-export type VercelDeploy = {
-  state: string;
-  url: string;
-  inspectorUrl: string | null;
-  createdMs: number;
-  commitMessage: string | null;
+  deploy: Deploy | null;
 };
 
 export type DoApp = {
@@ -51,7 +51,6 @@ export type ProjectStatus = {
   repoUrl: string | null;
   local: Source<LocalStatus>;
   github: Source<GithubStatus>;
-  vercel: Source<VercelDeploy | null>;
 };
 
 export type Dashboard = {

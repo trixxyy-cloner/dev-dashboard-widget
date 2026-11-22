@@ -12,11 +12,17 @@ export function ciLabel(ci: CiRun): string {
   return ci.conclusion ?? "klar";
 }
 
-export function vercelTone(state: string): Tone {
-  if (state === "READY") return "ok";
-  if (state === "ERROR") return "bad";
-  if (state === "CANCELED") return "idle";
-  return "busy";
+// GitHub commit status states posted by the hosting provider.
+export function deployTone(state: string): Tone {
+  if (state === "success") return "ok";
+  if (state === "pending") return "busy";
+  return "bad";
+}
+
+export function deployLabel(state: string): string {
+  if (state === "success") return "live";
+  if (state === "pending") return "bygger";
+  return "misslyckades";
 }
 
 export function doTone(phase: string): Tone {

@@ -4,9 +4,8 @@ mod git;
 mod github;
 mod snap;
 mod source;
-mod vercel;
 
-use config::{non_empty, Config, ProjectConfig};
+use config::{non_empty, ProjectConfig};
 use futures::future::join_all;
 use serde::Serialize;
 use snap::SnapState;
@@ -38,12 +37,11 @@ struct ProjectStatus {
     repo_url: Option<String>,
     local: Source<git::LocalStatus>,
     github: Source<github::GithubStatus>,
-    vercel: Source<Option<vercel::VercelDeploy>>,
 }
 
 struct Http(reqwest::Client);
 
-async fn project_status(client: &reqwest::Client, config: &Config, gh_token: Option<&str>, project: &ProjectConfig) -> ProjectStatus {
+async fn project_status(client: &reqwest::Client, gh_token: Option<&str>, project: &ProjectConfig) -> ProjectStatus {
     let local = async {
         match non_empty(&project.local_path) {
             Some(path) => git::status(path).await.into(),
@@ -57,16 +55,7 @@ async fn project_status(client: &reqwest::Client, config: &Config, gh_token: Opt
             (None, _) => Source::Off,
         }
     };
-    let vercel = async {
-        match (non_empty(&project.vercel_project), non_empty(&config.vercel_token)) {
-            (Some(name), Some(token)) => {
-                vercel::latest_production(client, token, non_empty(&config.vercel_team_id), name).await.into()
-            }
-            (Some(_), None) => Source::Error { message: "vercelToken saknas i config".into() },
-            (None, _) => Source::Off,
-        }
-    };
-    let (local, github, vercel) = tokio::join!(local, github, vercel);
+    let (local, github) = tokio::join!(local, github);
 
     ProjectStatus {
         name: project.name.clone(),
@@ -74,7 +63,6 @@ async fn project_status(client: &reqwest::Client, config: &Config, gh_token: Opt
         repo_url: non_empty(&project.repo).map(|repo| format!("https://github.com/{repo}")),
         local,
         github,
-        vercel,
     }
 }
 
@@ -85,7 +73,7 @@ async fn get_dashboard(http: tauri::State<'_, Http>, snap: tauri::State<'_, Snap
     let gh_token = github::resolve_token(non_empty(&config.github_token)).await;
 
     let projects = join_all(
-        config.projects.iter().map(|p| project_status(client, &config, gh_token.as_deref(), p)),
+        config.projects.iter().map(|p| project_status(client, gh_token.as_deref(), p)),
     );
     let digitalocean = async {
         match non_empty(&config.digitalocean_token) {
