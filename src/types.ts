@@ -56,6 +56,7 @@ export type ProjectStatus = {
 
 export type Dashboard = {
   refreshSeconds: number;
+  lockPosition: boolean;
   fetchedMs: number;
   projects: ProjectStatus[];
   digitalocean: Source<DoApp[]>;

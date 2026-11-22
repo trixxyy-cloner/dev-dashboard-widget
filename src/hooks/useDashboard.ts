@@ -35,6 +35,16 @@ export function useDashboard() {
     };
   }, [refresh]);
 
+  // "Lås position" in the tray menu.
+  useEffect(() => {
+    const unlisten = listen<boolean>("lock-changed", (event) => {
+      setData((current) => current && { ...current, lockPosition: event.payload });
+    });
+    return () => {
+      void unlisten.then((stop) => stop());
+    };
+  }, []);
+
   const refreshSeconds = data?.refreshSeconds ?? DEFAULT_REFRESH_SECONDS;
   useEffect(() => {
     const id = window.setInterval(() => void refresh(), refreshSeconds * 1000);
