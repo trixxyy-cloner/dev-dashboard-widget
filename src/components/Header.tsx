@@ -3,19 +3,30 @@ import type { ReactNode } from "react";
 
 type Props = {
   loading: boolean;
+  locked: boolean;
   updatedLabel: string | null;
   onRefresh: () => void;
   onOpenConfig: () => void;
 };
 
-export function Header({ loading, updatedLabel, onRefresh, onOpenConfig }: Props) {
+export function Header({ loading, locked, updatedLabel, onRefresh, onOpenConfig }: Props) {
+  // Tauri only checks that the attribute exists, so leave it off entirely when locked.
+  const drag = locked ? undefined : true;
   return (
     // The whole header is the drag handle since the window has no title bar.
-    <header data-tauri-drag-region className="flex cursor-grab items-center gap-2 px-3 pt-3 pb-2">
-      <span data-tauri-drag-region className="font-mono text-xs text-zinc-400">
+    <header data-tauri-drag-region={drag} className={`flex items-center gap-2 px-3 pt-3 pb-2 ${locked ? "" : "cursor-grab"}`}>
+      <span data-tauri-drag-region={drag} className="font-mono text-xs text-zinc-400">
         <span className="text-emerald-400">~/</span>dev-dashboard
       </span>
-      <span data-tauri-drag-region className="flex-1 truncate text-right text-[10px] text-zinc-500">
+      {locked && (
+        <span title="Positionen är låst (ändra i systemfältet)" className="text-zinc-500">
+          <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="5" y="11" width="14" height="10" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+        </span>
+      )}
+      <span data-tauri-drag-region={drag} className="flex-1 truncate text-right text-[10px] text-zinc-500">
         {loading ? "hämtar…" : updatedLabel}
       </span>
       <IconButton title="Uppdatera" onClick={onRefresh}>

@@ -17,6 +17,7 @@ export default function App() {
     <main className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/85 text-zinc-200 shadow-2xl">
       <Header
         loading={loading}
+        locked={data?.lockPosition ?? false}
         updatedLabel={data ? `uppdaterad ${timeAgo(data.fetchedMs, now)}` : null}
         onRefresh={() => void refresh()}
         onOpenConfig={openConfig}

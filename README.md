@@ -9,6 +9,8 @@ A small always-on-desktop widget for Windows that shows the status of my project
 
 Click a project name to open its repo, or any row to open that page. Refreshes every 2 minutes, or on demand. Lives in the system tray (left-click toggles the widget, right-click for refresh/config/quit) and starts with Windows.
 
+Drag the widget by its header; dropped near an edge or corner of any monitor it snaps into place. "Lås position" in the tray menu pins it, and if its monitor is disconnected it moves to the primary one.
+
 Built with **Tauri v2** (Rust) + **React** + **TypeScript** + **Tailwind CSS v4**. All API calls happen on the Rust side, so tokens never reach the web view or the repo.
 
 ## Configuration
@@ -19,6 +21,7 @@ On first start the app writes `%APPDATA%\dev-dashboard-widget\config.json`. Open
 {
   "refreshSeconds": 120,
   "startWithWindows": true,
+  "lockPosition": false,
   "githubToken": null,
   "vercelToken": "…",
   "vercelTeamId": null,

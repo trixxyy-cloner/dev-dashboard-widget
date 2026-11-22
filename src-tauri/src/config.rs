@@ -7,6 +7,7 @@ use std::path::PathBuf;
 pub struct Config {
     pub refresh_seconds: u64,
     pub start_with_windows: bool,
+    pub lock_position: bool,
     /// Optional. When empty, the token from the GitHub CLI (`gh auth token`) is used.
     pub github_token: Option<String>,
     pub vercel_token: Option<String>,
@@ -47,6 +48,7 @@ impl Default for Config {
         Self {
             refresh_seconds: 120,
             start_with_windows: true,
+            lock_position: false,
             github_token: None,
             vercel_token: None,
             vercel_team_id: None,
@@ -80,15 +82,20 @@ pub fn load() -> Result<Config, String> {
     let path = config_path();
     if !path.exists() {
         let config = Config::default();
-        if let Some(dir) = path.parent() {
-            std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
-        }
-        let json = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
-        std::fs::write(&path, json).map_err(|e| e.to_string())?;
+        save(&config)?;
         return Ok(config);
     }
     let text = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
     serde_json::from_str(&text).map_err(|e| format!("Fel i {}: {e}", path.display()))
+}
+
+pub fn save(config: &Config) -> Result<(), String> {
+    let path = config_path();
+    if let Some(dir) = path.parent() {
+        std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    }
+    let json = serde_json::to_string_pretty(config).map_err(|e| e.to_string())?;
+    std::fs::write(&path, json).map_err(|e| e.to_string())
 }
 
 /// Treats empty strings in the config the same as missing values.
